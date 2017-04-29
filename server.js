@@ -78,7 +78,5 @@ app.post('/:table', function(req, res) {
 })
 
 app.listen(app.get('port'), function() {
-  if (process.env.NODE_ENV == "development") {
-    console.log('Server started: http://localhost:' + app.get('port') + '/')
-  }
+  console.log('Server started: http://localhost:' + app.get('port') + '/')
 })
