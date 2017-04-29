@@ -14,17 +14,18 @@ const airtableBase = airtable.base('app3ydZAmRjmNCSrj');
 
 if (process.env.NODE_ENV == "development") {
   app.set('port', (process.env.PORT_DEVELOPMENT))
-  // prevent from throwing CORS error
-  app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
 }
 
 if (process.env.NODE_ENV == "production") {
   app.set('port', process.env.PORT_PRODUCTION)
 }
+
+// prevent from throwing CORS error
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
