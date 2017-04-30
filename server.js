@@ -2,6 +2,7 @@ require('dotenv').config();
 const objectAssign = require('object-assign');
 const express = require('express');
 const bodyParser = require('body-parser');
+const nodemailer = require("nodemailer");
 const app = express();
 
 // airtable setup
@@ -39,6 +40,33 @@ app.use(function(req, res, next) {
   next()
 })
 
+// create reusable transporter object using the default SMTP transport
+let transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+      user: 'kmartinezmedia@gmail.com',
+      pass: process.env.GMAIL_PASSWORD
+  }
+})
+
+app.post('/contact', function(req,res) {
+  let mailOptions = {
+    to : req.query.to,
+    subject : req.query.subject,
+    text : req.query.text
+  }
+  console.log(mailOptions);
+  transporter.sendMail(mailOptions, function(error, response){
+    if(error){
+      console.log(error);
+      res.end("error");
+    } else {
+      res.send("sent");
+      transporter.close();
+    }
+  });
+})
+
 // get work record from airtable with an id
 app.get('/work/:id', function(req, res) {
   const id = req.params.id;
@@ -66,7 +94,6 @@ app.get('/:table', function(req, res) {
   });
 })
 
-// Additional middleware which will set headers that we need on each request.
 app.post('/:table', function(req, res) {
   var table = req.params.table;
   airtableBase(table).create(req.body, {typecast: true}, function(err, record) {
@@ -76,6 +103,7 @@ app.post('/:table', function(req, res) {
     res.send(record.getId())
   })
 })
+
 
 app.listen(app.get('port'), function() {
   console.log('Server started: http://localhost:' + app.get('port') + '/')
